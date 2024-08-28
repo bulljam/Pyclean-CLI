@@ -1,0 +1,24 @@
+[project]
+name = "pyclean"
+version = "0.1.0"
+description = "Safe system cleaner CLI"
+requires-python = ">=3.11"
+dependencies = [
+    "typer[all]",
+    "rich"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy"
+]
+
+[project.scripts]
+pyclean = "pyclean.cli:app"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
