@@ -1,8 +1,9 @@
 .venv/
 __pycache__/
-*.pyc
 .pytest_cache/
-.coverage
-dist/
+.mypy_cache/
+.ruff_cache/
 build/
+dist/
 *.egg-info/
+*.pyc
