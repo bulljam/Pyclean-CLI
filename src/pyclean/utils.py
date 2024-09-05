@@ -3,9 +3,10 @@ from __future__ import annotations
 import fnmatch
 import json
 import logging
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 SIZE_UNITS: dict[str, int] = {
     "b": 1,
@@ -54,7 +55,7 @@ def format_size(size_bytes: int) -> str:
 
 
 def isoformat_utc(value: datetime) -> str:
-    return value.astimezone(timezone.utc).isoformat()
+    return value.astimezone(UTC).isoformat()
 
 
 def matches_any_pattern(path: Path, patterns: Iterable[str]) -> bool:

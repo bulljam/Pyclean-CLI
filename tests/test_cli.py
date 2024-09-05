@@ -46,4 +46,4 @@ def test_clean_temp_requires_yes_for_real_deletion(tmp_path: Path, monkeypatch) 
     result = runner.invoke(app, ["clean-temp", "--path", str(temp_root), "--no-dry-run"])
 
     assert result.exit_code != 0
-    assert "real deletion requires --yes" in result.stdout
+    assert "real deletion requires --yes" in result.stderr

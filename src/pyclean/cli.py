@@ -14,6 +14,7 @@ from pyclean.utils import configure_logging, dump_json, format_size, isoformat_u
 
 app = typer.Typer(help="Safely scan and clean junk files.", no_args_is_help=True)
 console = Console()
+DEFAULT_SCAN_PATH = Path.cwd()
 
 
 def _render_scan_table(entries: list[FileEntry]) -> None:
@@ -22,7 +23,11 @@ def _render_scan_table(entries: list[FileEntry]) -> None:
     table.add_column("Size", justify="right")
     table.add_column("Modified")
     for entry in entries:
-        table.add_row(str(entry.path), format_size(entry.size_bytes), isoformat_utc(entry.modified_at))
+        table.add_row(
+            str(entry.path),
+            format_size(entry.size_bytes),
+            isoformat_utc(entry.modified_at),
+        )
     console.print(table)
 
 
@@ -52,11 +57,19 @@ def _scan_to_json(entries: list[FileEntry], summary: dict[str, Any]) -> str:
     )
 
 
-def _cleanup_to_json(candidates: list[CleanupCandidate], actions: list[CleanupAction], summary: dict[str, Any]) -> str:
+def _cleanup_to_json(
+    candidates: list[CleanupCandidate],
+    actions: list[CleanupAction],
+    summary: dict[str, Any],
+) -> str:
     return dump_json(
         {
             "candidates": [
-                {"path": str(candidate.path), "kind": candidate.kind, "size_bytes": candidate.size_bytes}
+                {
+                    "path": str(candidate.path),
+                    "kind": candidate.kind,
+                    "size_bytes": candidate.size_bytes,
+                }
                 for candidate in candidates
             ],
             "actions": [
@@ -77,18 +90,30 @@ def main(
 
 @app.command("scan-large")
 def scan_large(
-    path: Annotated[Path, typer.Option("--path", exists=True, file_okay=False, dir_okay=True)] = Path.cwd(),
-    min_size: Annotated[str, typer.Option("--min-size", help="Minimum file size, e.g. 100MB.")] = "100MB",
-    limit: Annotated[int | None, typer.Option("--limit", min=1, help="Maximum number of results.")] = None,
+    path: Annotated[
+        Path,
+        typer.Option("--path", exists=True, file_okay=False, dir_okay=True),
+    ] = DEFAULT_SCAN_PATH,
+    min_size: Annotated[
+        str,
+        typer.Option("--min-size", help="Minimum file size, e.g. 100MB."),
+    ] = "100MB",
+    limit: Annotated[
+        int | None,
+        typer.Option("--limit", min=1, help="Maximum number of results."),
+    ] = None,
     json_output: Annotated[bool, typer.Option("--json", help="Output JSON.")] = False,
-    exclude: Annotated[list[str], typer.Option("--exclude", help="Glob pattern to exclude.")] = [],
+    exclude: Annotated[
+        list[str] | None,
+        typer.Option("--exclude", help="Glob pattern to exclude."),
+    ] = None,
 ) -> None:
     try:
         entries, summary = scan_large_files(
             base_path=path,
             min_size_bytes=parse_size(min_size),
             limit=limit,
-            exclude=tuple(exclude),
+            exclude=tuple(exclude or []),
         )
     except (ValueError, FileNotFoundError, NotADirectoryError) as exc:
         typer.secho(str(exc), err=True, fg=typer.colors.RED)
@@ -149,26 +174,50 @@ def _run_cleanup_command(
 
 @app.command("clean-temp")
 def clean_temp(
-    path: Annotated[Path | None, typer.Option("--path", help="Optional subpath inside safe temp roots.")] = None,
-    dry_run: Annotated[bool, typer.Option("--dry-run/--no-dry-run", help="Preview deletions.", show_default=True)] = True,
+    path: Annotated[
+        Path | None,
+        typer.Option("--path", help="Optional subpath inside safe temp roots."),
+    ] = None,
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run/--no-dry-run", help="Preview deletions.", show_default=True),
+    ] = True,
     yes: Annotated[bool, typer.Option("--yes", help="Required when using --no-dry-run.")] = False,
-    limit: Annotated[int | None, typer.Option("--limit", min=1, help="Maximum number of candidates.")] = None,
+    limit: Annotated[
+        int | None,
+        typer.Option("--limit", min=1, help="Maximum number of candidates."),
+    ] = None,
     json_output: Annotated[bool, typer.Option("--json", help="Output JSON.")] = False,
-    exclude: Annotated[list[str], typer.Option("--exclude", help="Glob pattern to exclude.")] = [],
+    exclude: Annotated[
+        list[str] | None,
+        typer.Option("--exclude", help="Glob pattern to exclude."),
+    ] = None,
 ) -> None:
-    _run_cleanup_command("temp", path, dry_run, yes, limit, json_output, exclude)
+    _run_cleanup_command("temp", path, dry_run, yes, limit, json_output, exclude or [])
 
 
 @app.command("clean-cache")
 def clean_cache(
-    path: Annotated[Path | None, typer.Option("--path", help="Optional subpath inside safe cache roots.")] = None,
-    dry_run: Annotated[bool, typer.Option("--dry-run/--no-dry-run", help="Preview deletions.", show_default=True)] = True,
+    path: Annotated[
+        Path | None,
+        typer.Option("--path", help="Optional subpath inside safe cache roots."),
+    ] = None,
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run/--no-dry-run", help="Preview deletions.", show_default=True),
+    ] = True,
     yes: Annotated[bool, typer.Option("--yes", help="Required when using --no-dry-run.")] = False,
-    limit: Annotated[int | None, typer.Option("--limit", min=1, help="Maximum number of candidates.")] = None,
+    limit: Annotated[
+        int | None,
+        typer.Option("--limit", min=1, help="Maximum number of candidates."),
+    ] = None,
     json_output: Annotated[bool, typer.Option("--json", help="Output JSON.")] = False,
-    exclude: Annotated[list[str], typer.Option("--exclude", help="Glob pattern to exclude.")] = [],
+    exclude: Annotated[
+        list[str] | None,
+        typer.Option("--exclude", help="Glob pattern to exclude."),
+    ] = None,
 ) -> None:
-    _run_cleanup_command("cache", path, dry_run, yes, limit, json_output, exclude)
+    _run_cleanup_command("cache", path, dry_run, yes, limit, json_output, exclude or [])
 
 
 if __name__ == "__main__":
