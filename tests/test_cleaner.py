@@ -69,7 +69,12 @@ def test_execute_cleanup_deletes_files_and_directories(
     monkeypatch.setenv("TMPDIR", str(temp_root))
 
     candidates = collect_cleanup_candidates(mode="temp", path=temp_root)
-    actions, summary = execute_cleanup(mode="temp", candidates=candidates, dry_run=False, confirmed=True)
+    actions, summary = execute_cleanup(
+        mode="temp",
+        candidates=candidates,
+        dry_run=False,
+        confirmed=True,
+    )
 
     assert not file_path.exists()
     assert not directory_path.exists()
@@ -91,7 +96,9 @@ def test_collect_cleanup_candidates_respects_exclude_patterns(
     assert [candidate.path.name for candidate in candidates] == ["keep.tmp"]
 
 
-def test_execute_cleanup_records_delete_errors(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_execute_cleanup_records_delete_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     temp_root = tmp_path / "temp"
     temp_root.mkdir()
     victim = temp_root / "victim.tmp"

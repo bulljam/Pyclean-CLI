@@ -5,7 +5,11 @@ import shutil
 from pathlib import Path
 
 from pyclean.models import CleanupAction, CleanupCandidate, CleanupMode, CleanupSummary
-from pyclean.rules import allowed_roots_for_mode, resolve_path, should_exclude, validate_cleanup_root
+from pyclean.rules import (
+    allowed_roots_for_mode,
+    should_exclude,
+    validate_cleanup_root,
+)
 
 logger = logging.getLogger("pyclean.cleaner")
 
@@ -34,7 +38,11 @@ def collect_cleanup_candidates(
                     continue
             try:
                 kind = "directory" if entry.is_dir() else "file"
-                size_bytes = entry.stat(follow_symlinks=follow_symlinks).st_size if entry.is_file() else None
+                size_bytes = (
+                    entry.stat(follow_symlinks=follow_symlinks).st_size
+                    if entry.is_file()
+                    else None
+                )
             except OSError as exc:
                 logger.warning("Skipping unreadable path %s: %s", entry, exc)
                 continue
