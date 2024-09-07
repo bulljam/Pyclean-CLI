@@ -13,6 +13,15 @@ The project is built for Python 3.11+, uses `Typer` for the CLI, `Rich` for term
 - JSON output is available for automation.
 - Exclusion globs let you protect specific files or directories.
 
+## Tech Stack
+
+- Python 3.11+
+- Typer for the CLI
+- Rich for terminal rendering
+- `pathlib` for filesystem paths
+- `pytest` for automated tests
+- `setuptools` with a `src/` layout for packaging
+
 ## Project Structure
 
 ```text
