@@ -110,6 +110,16 @@ Perform real deletion only after explicit confirmation:
 .venv/bin/pyclean clean-temp --path /tmp/my-safe-temp --no-dry-run --yes
 ```
 
+## Demo Folder
+
+A safe local dataset is available under `demo/testdata/` for trying the CLI without using real machine files.
+
+```bash
+.venv/bin/pyclean scan-large --path demo/testdata --min-size 1KB
+.venv/bin/pyclean clean-temp --path demo/testdata/temp --dry-run
+.venv/bin/pyclean clean-cache --path demo/testdata/cache --dry-run
+```
+
 ## Architecture
 
 The code is split into small layers so the safety model stays centralized:
