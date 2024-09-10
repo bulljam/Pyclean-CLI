@@ -26,6 +26,7 @@ The project is built for Python 3.11+, uses `Typer` for the CLI, `Rich` for term
 
 ```text
 pyclean/
+├── demo/testdata/
 ├── src/pyclean/
 │   ├── __init__.py
 │   ├── cleaner.py
@@ -69,45 +70,45 @@ Run tests:
 Run the CLI directly from the virtual environment:
 
 ```bash
-.venv/bin/pyclean --help
+.venv/bin/pyclean scan-large --path demo/testdata --min-size 1
 ```
 
 Or through Python:
 
 ```bash
-.venv/bin/python -m pyclean.cli --help
+.venv/bin/python -m pyclean.cli scan-large --path demo/testdata --min-size 1
 ```
 
 ## Usage Examples
 
-Scan for files larger than 500 MB:
+Scan the demo folder for files larger than 1 byte:
 
 ```bash
-.venv/bin/pyclean scan-large --path ~/Downloads --min-size 500MB --limit 20
+.venv/bin/pyclean scan-large --path demo/testdata --min-size 1 --limit 20
 ```
 
-Scan and emit JSON:
+Scan the demo folder and emit JSON:
 
 ```bash
-.venv/bin/pyclean scan-large --path . --min-size 50MB --json
+.venv/bin/pyclean scan-large --path demo/testdata --min-size 1 --json
 ```
 
-Preview temp cleanup without deleting anything:
+Preview temp cleanup in the demo temp folder:
 
 ```bash
-.venv/bin/pyclean clean-temp --dry-run
+.venv/bin/pyclean clean-temp --path demo/testdata/temp --dry-run
 ```
 
-Preview cache cleanup for a specific cache directory:
+Preview cache cleanup in the demo cache folder:
 
 ```bash
-.venv/bin/pyclean clean-cache --path ~/.cache --exclude "pip*" --json
+.venv/bin/pyclean clean-cache --path demo/testdata/cache --exclude "*.db" --json
 ```
 
 Perform real deletion only after explicit confirmation:
 
 ```bash
-.venv/bin/pyclean clean-temp --path /tmp/my-safe-temp --no-dry-run --yes
+.venv/bin/pyclean clean-temp --path demo/testdata/temp --no-dry-run --yes
 ```
 
 ## Demo Folder
@@ -115,7 +116,7 @@ Perform real deletion only after explicit confirmation:
 A safe local dataset is available under `demo/testdata/` for trying the CLI without using real machine files.
 
 ```bash
-.venv/bin/pyclean scan-large --path demo/testdata --min-size 1KB
+.venv/bin/pyclean scan-large --path demo/testdata --min-size 1
 .venv/bin/pyclean clean-temp --path demo/testdata/temp --dry-run
 .venv/bin/pyclean clean-cache --path demo/testdata/cache --dry-run
 ```
