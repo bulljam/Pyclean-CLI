@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from pyclean.cleaner import collect_cleanup_candidates, execute_cleanup
+from pyclean.rules import DEMO_TESTDATA_ROOT
 
 
 def test_collect_cleanup_candidates_uses_safe_temp_root(
@@ -26,6 +27,15 @@ def test_collect_cleanup_candidates_uses_safe_temp_root(
 def test_collect_cleanup_candidates_blocks_dangerous_path(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         collect_cleanup_candidates(mode="temp", path=Path("/"))
+
+
+def test_collect_cleanup_candidates_allows_demo_temp_folder() -> None:
+    candidates = collect_cleanup_candidates(
+        mode="temp",
+        path=DEMO_TESTDATA_ROOT / "temp",
+    )
+
+    assert any(candidate.path.name == "session.tmp" for candidate in candidates)
 
 
 def test_dry_run_does_not_delete_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

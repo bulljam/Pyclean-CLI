@@ -7,6 +7,9 @@ from pathlib import Path
 from pyclean.models import CleanupMode
 from pyclean.utils import matches_any_pattern
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEMO_TESTDATA_ROOT = PROJECT_ROOT / "demo" / "testdata"
+
 DANGEROUS_PATHS = {
     Path("/"),
     Path.home(),
@@ -39,6 +42,7 @@ def is_dangerous_path(path: Path) -> bool:
 def default_temp_roots() -> tuple[Path, ...]:
     candidates = {
         resolve_path(Path(tempfile.gettempdir())),
+        resolve_path(DEMO_TESTDATA_ROOT / "temp"),
     }
     for env_name in ("TMPDIR", "TEMP", "TMP"):
         env_value = os.getenv(env_name)
@@ -49,6 +53,7 @@ def default_temp_roots() -> tuple[Path, ...]:
 
 def default_cache_roots() -> tuple[Path, ...]:
     candidates: set[Path] = set()
+    candidates.add(resolve_path(DEMO_TESTDATA_ROOT / "cache"))
 
     xdg_cache = os.getenv("XDG_CACHE_HOME")
     if xdg_cache:
